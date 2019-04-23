@@ -12,7 +12,10 @@
 #	./check_smseagle -h IP-ADDRESS -c SNMP-COMMUNITY -s STATUSCHECK
 #
 #
-# 2019-04-17: initial Version     \\ Pit Wenkin
+# 2019-04-23:  Version 1.0     \\ Pit Wenkin
+#
+# Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one
+# while this plugin/snmp counts each message in a merged multipart message individually
 #
 ##
 
