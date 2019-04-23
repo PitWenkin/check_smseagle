@@ -183,7 +183,7 @@ else
 					intReturn=$STATE_CRITICAL
 				else
 					if [ "$SIGNAL1" -lt "$MINSIGNALWARN" ]; then
-						intReturn=$STATE_WARN
+						intReturn=$STATE_WARNING
 					else
 						intReturn=$STATE_OK
 					fi
@@ -208,7 +208,7 @@ else
 					intReturn=$STATE_CRITICAL
 				else
 					if [ $SIGNAL2 -lt $MINSIGNALWARN ]; then
-						intReturn=$STATE_WARN
+						intReturn=$STATE_WARNING
 					else
 						intReturn=$STATE_OK
 					fi
@@ -253,7 +253,7 @@ else
 				intReturn=$STATE_CRITICAL
 			else
 				if [ $SIGNAL1 -lt $MINSIGNALWARN ]; then
-					intReturn=$STATE_WARN
+					intReturn=$STATE_WARNING
 				else
 					intReturn=$STATE_OK
 				fi
@@ -271,7 +271,7 @@ else
 				intReturn=$STATE_CRITICAL
 			else
 				if [ $SIGNAL2 -lt $MINSIGNALWARN ]; then
-					intReturn=$STATE_WARN
+					intReturn=$STATE_WARNING
 				else
 					intReturn=$STATE_OK
 				fi
@@ -296,7 +296,7 @@ else
 				intReturn=$STATE_CRITICAL
 			else
 				if [ $HOURS == "0" ] && [ $MINUTES -lt "15" ]; then
-					intReturn=$STATE_WARN
+					intReturn=$STATE_WARNING
 				else
 					intReturn=$STATE_OK
 				fi
