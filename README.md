@@ -3,8 +3,12 @@ Nagios/Icinga script to check SMSEagle devices
 
 Used to check SMS Gateways https://www.smseagle.eu
 
-#Usage
+Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one while this plugin(snmp) counts each message in a merged multipart message individually!
+
+# Usage:
+```
 ./check_smseagle -h [hostname] -c [community] -s [status]
+```
 
 # Options:
 ```
