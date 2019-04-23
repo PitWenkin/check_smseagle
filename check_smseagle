@@ -82,9 +82,9 @@ usage()
 	echo "	-W [warning value]	% of signal strength at which a waring should be returned - default 50%"
 	echo "	-C [critical value]	% of signal strength at which a critical waring should be returned - default 25%"
 	echo ""
-	echo "examples:	./check_check_smseagle -h 1.2.3.4 -c public -s status 
-	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s antenna1 -W 50 -C 25
-	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s uptime -t 30
+	echo "examples:	./check_check_smseagle -h 1.2.3.4 -c public -s status"
+	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s antenna1 -W 50 -C 25"
+	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s uptime -t 30"
 	exit 3
 }
 
