@@ -26,7 +26,7 @@ Be advised: The sms count shown in the GUI/Dashboard counts merged multipart mes
     status		Global overview of everything"
     uptime		System uptime"
   -t [timeout]		duration before doing an timeout in seconds - default 10s"
-  -W [warning value]	% of signal strength at which a waring should be returned - default 50%"
+  -W [warning value]	% of signal strength at which a warning should be returned - default 50%"
   -C [critical value]	% of signal strength at which a critical waring should be returned - default 25%"
 ```
 
