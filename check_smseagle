@@ -12,7 +12,7 @@
 #	./check_smseagle -h IP-ADDRESS -c SNMP-COMMUNITY -s STATUSCHECK
 #
 #
-# 2019-04-24:  Version 1.0.1    \\ Pit Wenkin
+# 2019-04-24:  Version 1.0.2    \\ Pit Wenkin
 #
 # Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one
 # while this plugin/snmp counts each message in a merged multipart message individually
@@ -82,8 +82,8 @@ usage()
 	echo	 "	   status			Global overview of everything"
 	echo	 "	   uptime			System uptime"
 	echo "	-t [timeout]		duration before doing an timeout in seconds - default 10s"
-	echo "	-W [warning value]	% of signal strength at which a waring should be returned - default 50%"
-	echo "	-C [critical value]	% of signal strength at which a critical waring should be returned - default 25%"
+	echo "	-W [warning value]	% of signal strength at which a warning should be returned - default 50%"
+	echo "	-C [critical value]	% of signal strength at which a critical warning should be returned - default 25%"
 	echo ""
 	echo "examples:	./check_check_smseagle -h 1.2.3.4 -c public -s status"
 	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s antenna1 -W 50 -C 25"
