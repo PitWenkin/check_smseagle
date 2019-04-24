@@ -12,7 +12,7 @@
 #	./check_smseagle -h IP-ADDRESS -c SNMP-COMMUNITY -s STATUSCHECK
 #
 #
-# 2019-04-23:  Version 1.0     \\ Pit Wenkin
+# 2019-04-24:  Version 1.0.1    \\ Pit Wenkin
 #
 # Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one
 # while this plugin/snmp counts each message in a merged multipart message individually
@@ -292,10 +292,10 @@ else
 				MILLISECONDS=${BASH_REMATCH[5]}
 			fi
 			output="Uptime is $DAYS days $HOURS hours $MINUTES minutes"
-			if [ $HOURS == "0" ] && [ $MINUTES -lt "5" ]; then
+			if [ $DAYS == "0" ] && [ $HOURS == "0" ] && [ $MINUTES -lt "5" ]; then
 				intReturn=$STATE_CRITICAL
 			else
-				if [ $HOURS == "0" ] && [ $MINUTES -lt "15" ]; then
+				if [ $DAYS == "0" ] && [ $HOURS == "0" ] && [ $MINUTES -lt "15" ]; then
 					intReturn=$STATE_WARNING
 				else
 					intReturn=$STATE_OK
