@@ -28,6 +28,7 @@ SYSLOCATION=''
 SNMPVersion="2c"
 SNMPCommunity="public"
 SNMPTimeout="10"
+SNMPPort="161"
 
 # signal values for warning or critical
 MINSIGNALCRIT="15"
@@ -70,6 +71,7 @@ usage()
 	echo "options:"
 	echo "	-h [snmp hostname]	Hostname"
 	echo "	-c [community name]	community name (ex: public)"
+        echo "  -p [snmp port]          port for snmp request (default: 161)"
 	echo "	-s [check]		Check to be executed"
 	echo	 "	   antenna(1|2)			Network name and signal of antenna 1 or 2"
 	echo	 "	   inbox			Number of sms in the inbox"
@@ -85,9 +87,9 @@ usage()
 	echo "	-W [warning value]	% of signal strength at which a warning should be returned - default 50%"
 	echo "	-C [critical value]	% of signal strength at which a critical warning should be returned - default 25%"
 	echo ""
-	echo "examples:	./check_check_smseagle -h 1.2.3.4 -c public -s status"
-	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s antenna1 -W 50 -C 25"
-	echo "		./check_check_smseagle -h 1.2.3.4 -c public -s uptime -t 30"
+	echo "examples:	./check_smseagle -h 1.2.3.4 -c public -s status"
+	echo "		./check_smseagle -h 1.2.3.4 -c public -s antenna1 -W 50 -C 25"
+	echo "		./check_smseagle -h 1.2.3.4 -p 4321 -c public -s uptime -t 30"
 	exit 3
 }
 
@@ -95,10 +97,11 @@ if [ "$1" == "--help" ]; then
 	usage; exit 0
 fi
 
-while getopts c:h:s:t:C:W: OPTNAME; do
+while getopts c:h:p:s:t:C:W: OPTNAME; do
 	case "$OPTNAME" in
 	h)	hostname="$OPTARG";;
 	c)	SNMPCommunity="$OPTARG";;
+        p)      SNMPPort="$OPTARG";;
 	s)	status="$OPTARG";;
 	t)	SNMPTimeout="$OPTARG";;
 	C)	MINSIGNALCRIT="$OPTARG";;
@@ -118,7 +121,7 @@ fi
 if [ "$hostname" = "" ] || [ "$SNMPCommunity" = "" ] ; then
 	usage
 else
-	SNMPArgs=" -OQne -v $SNMPVersion -c $SNMPCommunity -t $SNMPTimeout $hostname"
+	SNMPArgs=" -OQne -v $SNMPVersion -c $SNMPCommunity -t $SNMPTimeout $hostname:$SNMPPort"
 
 	case "$status" in
 		status)
