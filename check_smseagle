@@ -12,7 +12,7 @@
 #	./check_smseagle -h IP-ADDRESS -c SNMP-COMMUNITY -s STATUSCHECK
 #
 #
-# 2019-04-24:  Version 1.0.2    \\ Pit Wenkin
+# 2019-06-25:  Version 1.1    \\ Pit Wenkin
 #
 # Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one
 # while this plugin/snmp counts each message in a merged multipart message individually
@@ -127,68 +127,71 @@ else
 		status)
 			status=`snmpwalk $SNMPArgs $OID_systemStatus 2> /dev/null`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
-				returnValue=$STATE_CRITICAL ;
-			fi
-
-		    	NETNAME1=$(echo "$status" | grep $OID_network1 | sed 's/.* = //g' | sed 's/"//g')
-		    	NETNAME2=$(echo "$status" | grep $OID_network2 | sed 's/.* = //g' | sed 's/"//g')
-		    	SIGNAL1=$(echo "$status" | grep $OID_signal1 | sed 's/.* = //g' | sed 's/"//g')
-		    	SIGNAL2=$(echo "$status" | grep $OID_signal2 | sed 's/.* = //g' | sed 's/"//g')
-		    	FOLDEROUTBOXTOTAL=$(echo "$status" | grep $OID_folderOutbox | sed 's/.* = //g' | sed 's/"//g')
-		    	FOLDERINBOXTOTAL=$(echo "$status" | grep $OID_folderInbox | sed 's/.* = //g' | sed 's/"//g')
-		    	FOLDERSENTLAST24H=$(echo "$status" | grep $OID_folderSent24h | sed 's/.* = //g' | sed 's/"//g')
-		    	FOLDERSENTLAST1M=$(echo "$status" | grep $OID_folderSent1m | sed 's/.* = //g' | sed 's/"//g')
-		    	FOLDERSENTLAST24HSENDERR=$(echo "$status" | grep $OID_folderSent24hErr | sed 's/.* = //g' | sed 's/"//g')
-
-			if [ "$NETNAME1" == "iso$OID_network1 = " ] ; then
-				output="Antenna 1 not connected\n"
-				returnValue=$STATE_UNKNOWN ;
-			else
-				output="Antenna 1 - $NETNAME1 $SIGNAL1%\n"
-			fi
-
-
-			if [ "$NETNAME2" == "iso$OID_network2 = " ] ; then
-				output=$output"Antenna 2 not connected\n"
-				returnValue=$STATE_UNKNOWN ;
-			else
-				output=$output"Antenna 2 - $NETNAME2 $SIGNAL2%\n"
-			fi
-
-			output=$output"$FOLDEROUTBOXTOTAL sms in outbox\n"
-			output=$output"$FOLDERINBOXTOTAL sms in inbox\n"
-			output=$output"$FOLDERSENTLAST24H sms sent in last 24 hours\n"
-			output=$output"$FOLDERSENTLAST1M sms sent in last month\n"
-
-			if [ "$FOLDERSENTLAST24HSENDERR" != "0" ] ; then
-				output=$output"$FOLDERSENTLAST24HSENDERR sms had errors while sending\n"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
 			else
-				output=$output"No errors in the last 24 hours\n"
+
+			    	NETNAME1=$(echo "$status" | grep $OID_network1 | sed 's/.* = //g' | sed 's/"//g')
+			    	NETNAME2=$(echo "$status" | grep $OID_network2 | sed 's/.* = //g' | sed 's/"//g')
+			    	SIGNAL1=$(echo "$status" | grep $OID_signal1 | sed 's/.* = //g' | sed 's/"//g')
+			    	SIGNAL2=$(echo "$status" | grep $OID_signal2 | sed 's/.* = //g' | sed 's/"//g')
+			    	FOLDEROUTBOXTOTAL=$(echo "$status" | grep $OID_folderOutbox | sed 's/.* = //g' | sed 's/"//g')
+			    	FOLDERINBOXTOTAL=$(echo "$status" | grep $OID_folderInbox | sed 's/.* = //g' | sed 's/"//g')
+			    	FOLDERSENTLAST24H=$(echo "$status" | grep $OID_folderSent24h | sed 's/.* = //g' | sed 's/"//g')
+			    	FOLDERSENTLAST1M=$(echo "$status" | grep $OID_folderSent1m | sed 's/.* = //g' | sed 's/"//g')
+			    	FOLDERSENTLAST24HSENDERR=$(echo "$status" | grep $OID_folderSent24hErr | sed 's/.* = //g' | sed 's/"//g')
+
+
+				if [ "$NETNAME1" == "iso$OID_network1 = " ] ; then
+					output="Antenna 1 not connected\n"
+					returnValue=$STATE_UNKNOWN ;
+				else
+					output="Antenna 1 - $NETNAME1 $SIGNAL1%\n"
+				fi
+
+
+				if [ "$NETNAME2" == "iso$OID_network2 = " ] ; then
+					output=$output"Antenna 2 not connected\n"
+					returnValue=$STATE_UNKNOWN ;
+				else
+					output=$output"Antenna 2 - $NETNAME2 $SIGNAL2%\n"
+				fi
+
+				output=$output"$FOLDEROUTBOXTOTAL sms in outbox\n"
+				output=$output"$FOLDERINBOXTOTAL sms in inbox\n"
+				output=$output"$FOLDERSENTLAST24H sms sent in last 24 hours\n"
+				output=$output"$FOLDERSENTLAST1M sms sent in last month\n"
+
+				if [ "$FOLDERSENTLAST24HSENDERR" != "0" ] ; then
+					output=$output"$FOLDERSENTLAST24HSENDERR sms had errors while sending\n"
+					returnValue=$STATE_CRITICAL ;
+				else
+					output=$output"No errors in the last 24 hours\n"
+				fi
 			fi
 		;;
 
 		antenna1)
 			ANTENNA1=`snmpget $SNMPArgs $OID_network1 $OID_signal1`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
-			fi
-			NETNAME1=$(echo "$ANTENNA1" | grep $OID_network1 | sed 's/.* = //g' | sed 's/"//g')
-			SIGNAL1=$(echo "$ANTENNA1" | grep $OID_signal1 | sed 's/.* = //g' | sed 's/"//g')
-			if [ "$NETNAME1" == "" ]; then
-				output="Antenna 1 not connected"
-				intReturn=$STATE_CRITICAL
 			else
-				output="Antenna 1 - $NETNAME1 $SIGNAL1%"
-				if [ "$SIGNAL1" -lt "$MINSIGNALCRIT" ]; then
+				NETNAME1=$(echo "$ANTENNA1" | grep $OID_network1 | sed 's/.* = //g' | sed 's/"//g')
+				SIGNAL1=$(echo "$ANTENNA1" | grep $OID_signal1 | sed 's/.* = //g' | sed 's/"//g')
+				if [ "$NETNAME1" == "" ]; then
+					output="Antenna 1 not connected"
 					intReturn=$STATE_CRITICAL
 				else
-					if [ "$SIGNAL1" -lt "$MINSIGNALWARN" ]; then
-						intReturn=$STATE_WARNING
+					output="Antenna 1 - $NETNAME1 $SIGNAL1%"
+					if [ "$SIGNAL1" -lt "$MINSIGNALCRIT" ]; then
+						intReturn=$STATE_CRITICAL
 					else
-						intReturn=$STATE_OK
+						if [ "$SIGNAL1" -lt "$MINSIGNALWARN" ]; then
+							intReturn=$STATE_WARNING
+						else
+							intReturn=$STATE_OK
+						fi
 					fi
 				fi
 			fi
@@ -197,16 +200,87 @@ else
 		antenna2)
 			ANTENNA2=`snmpget $SNMPArgs $OID_network2 $OID_signal2`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
-			fi
-			NETNAME2=$(echo "$ANTENNA2" | grep $OID_network2 | sed 's/.* = //g' | sed 's/"//g')
-			SIGNAL2=$(echo "$ANTENNA2" | grep $OID_signal2 | sed 's/.* = //g' | sed 's/"//g')
-			if [ "$NETNAME2" == "" ]; then
-				output="Antenna 2 not connected"
-				intReturn=$STATE_CRITICAL
 			else
-				output="Antenna 2 - $NETNAME2 $SIGNAL2%"
+				NETNAME2=$(echo "$ANTENNA2" | grep $OID_network2 | sed 's/.* = //g' | sed 's/"//g')
+				SIGNAL2=$(echo "$ANTENNA2" | grep $OID_signal2 | sed 's/.* = //g' | sed 's/"//g')
+				if [ "$NETNAME2" == "" ]; then
+					output="Antenna 2 not connected"
+					intReturn=$STATE_CRITICAL
+				else
+					output="Antenna 2 - $NETNAME2 $SIGNAL2%"
+					if [ $SIGNAL2 -lt $MINSIGNALCRIT ]; then
+						intReturn=$STATE_CRITICAL
+					else
+						if [ $SIGNAL2 -lt $MINSIGNALWARN ]; then
+							intReturn=$STATE_WARNING
+						else
+							intReturn=$STATE_OK
+						fi
+					fi
+				fi
+			fi
+		;;
+
+		netname1)
+			NETNAME1=`snmpget $SNMPArgs $OID_network1 | sed 's/.* = //g' | sed 's/"//g'`
+			if [ "$?" != "0" ] ; then
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
+				returnValue=$STATE_CRITICAL ;
+			else
+				if [ "$NETNAME1" == "" ]; then
+					output="Antenna 1 not connected"
+					intReturn=$STATE_CRITICAL
+				else
+					output="Antenna 1 - $NETNAME1 "
+					intReturn=$STATE_k
+				fi
+			fi
+		;;
+
+		netname2)
+			NETNAME2=`snmpget $SNMPArgs $OID_network2 | sed 's/.* = //g' | sed 's/"//g'`
+			if [ "$?" != "0" ] ; then
+                                output="CRITICAL - Problem with SNMP request, check user/password/host"
+                                returnValue=$STATE_CRITICAL ;
+                        else
+				if [ "$NETNAME2" == "" ]; then
+					output="Antenna 2 not connected"
+					intReturn=$STATE_CRITICAL
+				else
+					output="Antenna 2 - $NETNAME2"
+					intReturn=$STATE_k
+				fi
+			fi
+		;;
+
+		signal1)
+			SIGNAL1=`snmpget $SNMPArgs $OID_signal1 | sed 's/.* = //g' | sed 's/"//g'`
+			if [ "$?" != "0" ] ; then
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
+				returnValue=$STATE_CRITICAL ;
+			else
+				output="Antenna 1 signal $SIGNAL1"
+				if [ $SIGNAL1 -lt $MINSIGNALCRIT ]; then
+					intReturn=$STATE_CRITICAL
+				else
+					if [ $SIGNAL1 -lt $MINSIGNALWARN ]; then
+						intReturn=$STATE_WARNING
+					else
+						intReturn=$STATE_OK
+					fi
+				fi
+			fi
+		;;
+
+		signal2)
+			SIGNAL2=`snmpget $SNMPArgs $OID_signal2 | sed 's/.* = //g' | sed 's/"//g'`
+			if [ "$?" != "0" ] ; then
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
+				returnValue=$STATE_CRITICAL ;
+			else
+				output="Antenna 2 signal $SIGNAL2"
 				if [ $SIGNAL2 -lt $MINSIGNALCRIT ]; then
 					intReturn=$STATE_CRITICAL
 				else
@@ -219,89 +293,29 @@ else
 			fi
 		;;
 
-		netname1)
-			NETNAME1=`snmpget $SNMPArgs $OID_network1 | sed 's/.* = //g' | sed 's/"//g'`
-			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
-				returnValue=$STATE_CRITICAL ;
-			fi
-			if [ "$NETNAME1" == "" ]; then
-				output="Antenna 1 not connected"
-				intReturn=$STATE_CRITICAL
-			else
-				output="Antenna 1 - $NETNAME1 "
-				intReturn=$STATE_k
-			fi
-		;;
-
-		netname2)
-			NETNAME2=`snmpget $SNMPArgs $OID_network2 | sed 's/.* = //g' | sed 's/"//g'`
-			if [ "$NETNAME2" == "" ]; then
-				output="Antenna 2 not connected"
-				intReturn=$STATE_CRITICAL
-			else
-				output="Antenna 2 - $NETNAME2"
-				intReturn=$STATE_k
-			fi
-		;;
-
-		signal1)
-			SIGNAL1=`snmpget $SNMPArgs $OID_signal1 | sed 's/.* = //g' | sed 's/"//g'`
-			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
-				returnValue=$STATE_CRITICAL ;
-			fi
-			output="Antenna 1 signal $SIGNAL1"
-			if [ $SIGNAL1 -lt $MINSIGNALCRIT ]; then
-				intReturn=$STATE_CRITICAL
-			else
-				if [ $SIGNAL1 -lt $MINSIGNALWARN ]; then
-					intReturn=$STATE_WARNING
-				else
-					intReturn=$STATE_OK
-				fi
-			fi
-		;;
-
-		signal2)
-			SIGNAL2=`snmpget $SNMPArgs $OID_signal2 | sed 's/.* = //g' | sed 's/"//g'`
-			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
-				returnValue=$STATE_CRITICAL ;
-			fi
-			output="Antenna 2 signal $SIGNAL2"
-			if [ $SIGNAL2 -lt $MINSIGNALCRIT ]; then
-				intReturn=$STATE_CRITICAL
-			else
-				if [ $SIGNAL2 -lt $MINSIGNALWARN ]; then
-					intReturn=$STATE_WARNING
-				else
-					intReturn=$STATE_OK
-				fi
-			fi
-		;;
-
 		uptime)
 			SYSUPTIME=`snmpget $SNMPArgs $OID_systemUpTime | sed 's/.* = //g' | sed 's/"//g'`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
-			fi
-			if [[ $SYSUPTIME =~ (.*):(.*):(.*):(.*)\.(.*) ]]; then
-				DAYS=${BASH_REMATCH[1]}
-				HOURS=${BASH_REMATCH[2]}
-				MINUTES=${BASH_REMATCH[3]}
-				SECONDS=${BASH_REMATCH[4]}
-				MILLISECONDS=${BASH_REMATCH[5]}
-			fi
-			output="Uptime is $DAYS days $HOURS hours $MINUTES minutes"
-			if [ $DAYS == "0" ] && [ $HOURS == "0" ] && [ $MINUTES -lt "5" ]; then
-				intReturn=$STATE_CRITICAL
 			else
-				if [ $DAYS == "0" ] && [ $HOURS == "0" ] && [ $MINUTES -lt "15" ]; then
-					intReturn=$STATE_WARNING
-				else
-					intReturn=$STATE_OK
+				if [[ $SYSUPTIME =~ (.*):(.*):(.*):(.*)\.(.*) ]]; then
+					DAYS=${BASH_REMATCH[1]}
+					HOURS=${BASH_REMATCH[2]}
+					MINUTES=${BASH_REMATCH[3]}
+					SECONDS=${BASH_REMATCH[4]}
+					MILLISECONDS=${BASH_REMATCH[5]}
+
+					output="Uptime is $DAYS days $HOURS hours $MINUTES minutes"
+					if [ $DAYS == "0" ] && [ $HOURS == "0" ] && [ $MINUTES -lt "5" ]; then
+						intReturn=$STATE_CRITICAL
+					else
+						if [ $DAYS == "0" ] && [ $HOURS == "0" ] && [ $MINUTES -lt "15" ]; then
+							intReturn=$STATE_WARNING
+						else
+							intReturn=$STATE_OK
+						fi
+					fi
 				fi
 			fi
 		;;
@@ -309,50 +323,55 @@ else
 		inbox)
 			FOLDERINBOXTOTAL=`snmpget $SNMPArgs $OID_folderInbox | sed 's/.* = //g' | sed 's/"//g'`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
+			else
+				output="$FOLDERINBOXTOTAL sms in inbox"
 			fi
-			output="$FOLDERINBOXTOTAL sms in inbox"
 		;;
 
 		outbox)
 			FOLDEROUTBOXTOTAL=`snmpget $SNMPArgs $OID_folderOutbox | sed 's/.* = //g' | sed 's/"//g'`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
+			else
+				output="$FOLDEROUTBOXTOTAL sms in outbox"
 			fi
-			output="$FOLDEROUTBOXTOTAL sms in outbox"
 		;;
 
 		sent1m)
 			FOLDERSENTLAST1M=`snmpget $SNMPArgs $OID_folderSent1m | sed 's/.* = //g' | sed 's/"//g'`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
+			else
+				output="$FOLDERSENTLAST1M sms sent in last month"
 			fi
-			output="$FOLDERSENTLAST1M sms sent in last month"
 		;;
 
 		sent24h)
 			FOLDERSENTLAST24H=`snmpget $SNMPArgs $OID_folderSent24h | sed 's/.* = //g' | sed 's/"//g'`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
+			else
+				output="$FOLDERSENTLAST24H sms sent in last 24 hours"
 			fi
-			output="$FOLDERSENTLAST24H sms sent in last 24 hours"
 		;;
 
 		sent24herr)
 			FOLDERSENTLAST24HSENDERR=`snmpget $SNMPArgs $OID_folderSent24hErr | sed 's/.* = //g' | sed 's/"//g'`
 			if [ "$?" != "0" ] ; then
-				echo "CRITICAL - Problem with SNMP request, check user/password/host"
-				returnValue=$STATE_CRITICAL ;
-			fi
-			if [ "$FOLDERSENTLAST24HSENDERR" != "0" ] ; then
-				output=$output"$FOLDERSENTLAST24HSENDERR sms had errors while sending"
+				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				returnValue=$STATE_CRITICAL ;
 			else
-				output=$output"No errors in the last 24 hours"
+				if [ "$FOLDERSENTLAST24HSENDERR" != "0" ] ; then
+					output=$output"$FOLDERSENTLAST24HSENDERR sms had errors while sending"
+					returnValue=$STATE_CRITICAL ;
+				else
+					output=$output"No errors in the last 24 hours"
+				fi
 			fi
 		;;
 
