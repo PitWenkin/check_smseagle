@@ -159,7 +159,7 @@ else
 			output=$output"$FOLDERSENTLAST1M sms sent in last month\n"
 
 			if [ "$FOLDERSENTLAST24HSENDERR" != "0" ] ; then
-				output=$output"FOLDERSENTLAST24HSENDERR sms had errors while sending\n"
+				output=$output"$FOLDERSENTLAST24HSENDERR sms had errors while sending\n"
 				returnValue=$STATE_CRITICAL ;
 			else
 				output=$output"No errors in the last 24 hours\n"
