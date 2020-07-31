@@ -3,7 +3,13 @@ Nagios/Icinga script to check SMSEagle devices
 
 Used to check SMS Gateways https://www.smseagle.eu
 
-Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one while this plugin(snmp) counts each message in a merged multipart message individually!
+# Be advised:
+
+The sms count shown in the GUI/Dashboard counts merged multipart messages as one while this plugin(snmp) counts each message in a merged multipart message individually!
+
+SMSEagle software update '3.51' overwrites snmpd.conf! To reactivate humidity, temperature (and stauts) check you'll nee to add
+`view    limited included        .1.3.6.1.4.1.8072.1.3.2.4.1.2`
+to snmpd.comf
 
 # Usage:
 ```
