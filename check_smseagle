@@ -12,7 +12,7 @@
 #	./check_smseagle -h IP-ADDRESS -c SNMP-COMMUNITY -s STATUSCHECK
 #
 #
-# 2019-07-01:  Version 1.2    \\ Pit Wenkin
+# 2022-05-13:  Version 1.3    \\ Pit Wenkin
 #
 # Be advised: The sms count shown in the GUI/Dashboard counts merged multipart messages as one
 # while this plugin/snmp counts each message in a merged multipart message individually
@@ -360,15 +360,20 @@ else
 				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				intReturn=$STATE_CRITICAL ;
 			else
-				output="$HUMIDITY% humidity"
-				HUMIDITY=$((10*HUMIDITY))
-				if [ $HUMIDITY -gt 500 ]; then
-					intReturn=$STATE_CRITICAL
+				if [ "$HUMIDITY" == "" ]; then
+					output="CRITICAL - Sensor returned nothing"
+					intReturn=$STATE_UNKNOWN ;
 				else
-					if [ $HUMIDITY -gt 400 ]; then
-						intReturn=$STATE_WARNING
+					output="$HUMIDITY% humidity"
+					HUMIDITY=$((10*HUMIDITY))
+					if [ $HUMIDITY -gt 500 ]; then
+						intReturn=$STATE_CRITICAL
 					else
-						intReturn=$STATE_OK
+						if [ $HUMIDITY -gt 400 ]; then
+							intReturn=$STATE_WARNING
+						else
+							intReturn=$STATE_OK
+						fi
 					fi
 				fi
 			fi
@@ -380,15 +385,20 @@ else
 				output="CRITICAL - Problem with SNMP request, check user/password/host"
 				intReturn=$STATE_CRITICAL ;
 			else
-				output="$TEMPERATURE°C temperature"
-				TEMPERATURE=$((10*TEMPERATURE))
-				if [ $TEMPERATURE -gt 500 ]; then
-					intReturn=$STATE_CRITICAL
+				if [ "$TEMPERATURE" == "" ]; then
+					output="CRITICAL - Sensor returned nothing"
+					intReturn=$STATE_UNKNOWN ;
 				else
-					if [ $TEMPERATURE -gt 400 ]; then
-						intReturn=$STATE_WARNING
+					output="$TEMPERATURE°C temperature"
+					TEMPERATURE=$((10*TEMPERATURE))
+					if [ $TEMPERATURE -gt 500 ]; then
+						intReturn=$STATE_CRITICAL
 					else
-						intReturn=$STATE_OK
+						if [ $TEMPERATURE -gt 400 ]; then
+							intReturn=$STATE_WARNING
+						else
+							intReturn=$STATE_OK
+						fi
 					fi
 				fi
 			fi
